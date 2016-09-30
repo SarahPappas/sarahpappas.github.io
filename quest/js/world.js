@@ -34,7 +34,7 @@ function World(player, hud) {
 	this._setupForest();
     
 	// Add fog
-	this.scene.fog = new THREE.Fog(GREY, .0001, 150);
+	this.scene.fog = new THREE.Fog(GREY, .0001, 50);
 
     // add subtle ambient lighting
     var ambientLight = new THREE.AmbientLight(0x404040);
