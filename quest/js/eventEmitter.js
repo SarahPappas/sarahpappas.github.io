@@ -22,7 +22,29 @@
  * SOFTWARE.
  */
  
- // TODO: game should start world and make the world.
-var world = new World();
-var game = new Game(world);
-world.start();
+function EventEmitter() {
+    // Object whose keys are event names and values are arrays of event listener functions.
+    this._eventListeners = {};
+}
+
+EventEmitter.prototype = {
+    addEventListener: function (eventName, eventListener) {
+        // If this we're registering the first event listener for this event 
+        // name, create an array to hold event listeners.
+        if (!this._eventListeners[eventName]) {
+            this._eventListeners[eventName] = [];
+        }
+
+        // Add the event listener to the array for the event name.
+        this._eventListeners[eventName].push(eventListener);
+    },
+    emit: function (eventName, eventObject) {
+        var eventListeners = this._eventListeners[eventName];
+        // If there are any eventListeners, loop through each listener function 
+        // and call it with the eventObject as the parameter.
+        eventListeners.forEach(function (listenerFunction) {
+            listenerFunction(eventObject);
+        })
+    }
+};
+

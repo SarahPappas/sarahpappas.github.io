@@ -1,92 +1,149 @@
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 Sarah Pappas
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights 
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+ * copies of the Software, and to permit persons to whom the Software is 
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+ 
 function Game(world) {
-	// QUESTION would you make these constants??
 	this.world = world;
-	this.riddleContainerEl = $(".riddleContainer");
-	var submitButton = $("#answer-button");
-	this.questionEl = $(".riddleContainer .question");
-	var startButtonEl = $("#start-button");
-	this.correctAnswersNeeded = 3;
-	this.riddlesAnsweredCorrectly = 0;
 
-	this.riddleIndex = null;
-	this.userInput = "";
-
-
-	this._exitDisplayRiddle = this._exitDisplayRiddle.bind(this);
-
-	startButtonEl.click(function() {
-		$(".instruction-container").css("display", "none");
-	})
+	// Grab elements from the DOM.
+	this._riddleContainerEl = $(".riddle-container");
+	this._questionEl = $(".riddle-container .question");
 	
-	this.world.player.addEventListener("pillarDetected", function() {
-		this.riddleContainerEl.css("display", "initial");
-		this._displayRiddle();
-	}.bind(this))
+	// Set the number of correct answers required before we tell the user where 
+	// to look for the treasure.
+	this._correctAnswersNeeded = 3;
+	
+	// Set current number of riddles answered correctly.
+	this._riddlesAnsweredCorrectly = 0;
 
-	this.world.player.addEventListener("treasureDetected", function() {
-		this.riddleContainerEl.css("display", "initial");
-		this._congratualateWinner();
-	}.bind(this))
+	this._currentRiddleIndex = null;
 
-	submitButton.click(function(event) {
+	this._hideRiddle = this._hideRiddle.bind(this);
+
+	var startButtonEl = $("#js-start-button");
+	// After the user clicks start, we no longer display start dialog.
+	startButtonEl.click(function () {
+		$(".instruction-container").addClass("hidden");
+	});
+	
+	this.world.player.addEventListener("pillarEncountered", function (pillarIndex) {
+		this.world.discoverPillar(pillarIndex);
+		this._showRiddleDialog();
+	}.bind(this));
+
+	this.world.player.addEventListener("treasureEncountered", function () {
+		this._showWinnerDialog();
+	}.bind(this));
+
+	var submitButton = $("#js-answer-button");
+	submitButton.click(function (event) {
 		var userInputEl = $("input[name='answer']");
-		// save user input
-		this.userInput = userInputEl.val();
-		//clearInput
+		// Save user input.
+		var userAnswer = userInputEl.val();
+		// clear user input.
 		userInputEl.val("");
-		//Say if you were correct and which direction to head - use question div
-		this._interactWithUser();
-		//hide the form 
-		$(".answer").css("display", "none");
-	}.bind(this))
+		// Dicide if user was correct and display the next direction to head 
+		// using the #question div.
+		this._interactWithUser(userAnswer);
+		// Hide the question / answer dialog.
+		$(".answer").addClass("hidden");
+	}.bind(this));
 
 }
 
 Game.prototype = {
-	_displayRiddle: function() {
-		this.riddleIndex = Math.floor(Math.random() * riddles.length);
-		this.questionEl.text(riddles[this.riddleIndex].Question);
-		//display answer form
-		$(".answer").css("display", "initial");
+	_displayText: function (text) {
+		this._questionEl.text(text);
 	},
-	_isRiddleCorrect: function() {
-		var riddleAnswer = riddles[this.riddleIndex].Answer;
-		if (this.userInput.toLowerCase().indexOf(riddleAnswer) == -1) {
-			return false;
+	_getRandomRiddle: function () {
+		var riddleIndex = Math.floor(Math.random() * riddles.length);
+		this._currentRiddleIndex = riddleIndex;
+		
+		var riddle = riddles[riddleIndex].question;
+		return riddle;
+	},
+	_isRiddleCorrect: function (riddle, userAnswer) {
+		return userAnswer.toLowerCase().indexOf(riddle.answer.toLowerCase()) != -1;
+	},
+	_showTreasure: function () {
+		this._displayText("I'm so pleased you are correct! Please see your HUD for the location of the treasure.");
+		this.world.hud.addHintSphere(this.world.getTreasurePosition());
+	},
+	_showNoPillarsLeft: function () {
+		this._displayText("I'm so pleased you are correct! Unfortunately, there are no more pillars to guide you.");
+	},
+	_showNextPillar: function () {
+		this._displayText("I'm so pleased you are correct! Please see your HUD for the location of the next pillar.");
+		this.world.hud.addHintSphere(this.world.getRandomUndiscoveredPillarPosition());
+	},
+	_showNoHelp: function () {
+		this._displayText("Sorry to say, but you will get no help from me");
+	},
+	_hideDialog: function () {
+		this._riddleContainerEl.addClass("hidden");
+	},
+	_interactWithUser: function (userAnswer) {
+		this.world.hud.removeHintSphere();
+
+		// Remove riddle that is already shown.
+		var riddle = riddles.splice(this._currentRiddleIndex, 1)[0];
+
+		// Decide what help to show player depending on their riddle answer.
+		if (this._isRiddleCorrect(riddle, userAnswer)) {
+			this._riddlesAnsweredCorrectly++;
+
+			if (this._riddlesAnsweredCorrectly >= this._correctAnswersNeeded) {
+				this._showTreasure();
+			} else if (riddles.length == 0) { 
+				this._showNoPillarsLeft();
+			} else {			
+				this._showNextPillar();
+			}
 		} else {
-			return true;
+			this._showNoHelp();
+		}
+
+		// After you've answered the riddle and we have shown a message, we 
+		// dismiss the message when the user hits any arrow key to start moving
+		// again.
+		document.addEventListener("keydown", this._hideRiddle);
+	},
+	_hideRiddle: function (e) {
+		if (e.keyCode == KeyCodes.UP_ARROW_KEY_CODE || 
+			e.keyCode == KeyCodes.DOWN_ARROW_KEY_CODE || 
+			e.keyCode == KeyCodes.RIGHT_ARROW_KEY_CODE || 
+			e.keyCode == KeyCodes.LEFT_ARROW_KEY_CODE) {
+			this._hideDialog();
+			document.removeEventListener("keydown", this._hideRiddle);
 		}
 	},
-	_interactWithUser: function() {
-		// TODO: pass sphere instead of hardcode
-		if(this.world.hud.hintSphere){
-			this.world.hud.removeObjectFromScene();
-		}
-		//this.correctAnswersNeeded
-		if (this._isRiddleCorrect() && this.riddlesAnsweredCorrectly >= this.correctAnswersNeeded) {
-			this.questionEl.text("I'm so pleased you are correct! " + " Please see your HUD for the location of the box.");
-			this.world.hud.addTargetArea(this.world.getPositionOfTreasure());
-		} else if (this._isRiddleCorrect()) {
-			this.questionEl.text("I'm so pleased you are correct" + " Please see your HUD for the location of the next pillar.");
-			this.riddlesAnsweredCorrectly++;
-			this.world.hud.addTargetArea(this.world.getPositionOfNextPillar());
-			// display next pillar
-		} else {
-			this.questionEl.text("Sorry to say, but you will get no help from me");
-			// display treasure
-		}
-		// remove riddle that is already shown
-		riddles.splice(this.riddleIndex, 1);
-		// on any arrow key down hide the riddles modal
-		document.addEventListener("keydown", this._exitDisplayRiddle);
+	_showRiddleDialog: function () {
+		this._riddleContainerEl.removeClass("hidden");
+		this._displayText(this._getRandomRiddle());
+		$(".answer").removeClass("hidden");
 	},
-	_exitDisplayRiddle: function(e) {
-		if (e.keyCode == UP_ARROW_KEY_CODE || e.keyCode == DOWN_ARROW_KEY_CODE || e.keyCode == RIGHT_ARROW_KEY_CODE || e.keyCode == LEFT_ARROW_KEY_CODE) {
-			this.riddleContainerEl.css("display", "none");
-			document.removeEventListener("keydown", this._exitDisplayRiddle);
-		}
-	},
-	_congratualateWinner: function() {
-		this.questionEl.text("Congratulations!! You're a winner");
+	_showWinnerDialog: function () {
+		this._riddleContainerEl.removeClass("hidden");
+		this._questionEl.text("Congratulations! You're a winner");
 	}
 };

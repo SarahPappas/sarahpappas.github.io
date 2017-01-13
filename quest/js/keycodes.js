@@ -21,8 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
- // TODO: game should start world and make the world.
-var world = new World();
-var game = new Game(world);
-world.start();
+
+var KeyCodes = {
+    UP_ARROW_KEY_CODE: 38,
+    DOWN_ARROW_KEY_CODE: 40,
+    RIGHT_ARROW_KEY_CODE: 39,
+    LEFT_ARROW_KEY_CODE: 37   
+};

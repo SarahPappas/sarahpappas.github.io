@@ -1,6 +1,7 @@
 # Quest
-Welcome to the Quest. 
 
-On your journey you will look for pillars, which will present you with riddles. If you get the answer right, you will get directions. If you get it wrong, you will continue wandering. Find the treasure chest to win.
+The Quest is an adventure game.
 
-Use the arrow keys to move around in the world.
+Wander through the 3d forest looking for pillars. When you encounter a pillar, it will give you a riddle. Answer the riddle correctly, and the location of the next pillar will appear on your minimap. You must answer three riddles correctly to be given the location of the treasure. 
+
+Use the arrow keys to move around.

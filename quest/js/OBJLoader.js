@@ -109,7 +109,7 @@ THREE.OBJLoader.prototype = {
                     materials : [],
                     smooth : true,
 
-                    startMaterial : function( name, libraries ) {
+                    startMaterial : function ( name, libraries ) {
 
                         var previous = this._finalize( false );
 
@@ -131,7 +131,7 @@ THREE.OBJLoader.prototype = {
                             groupCount : -1,
                             inherited  : false,
 
-                            clone : function( index ) {
+                            clone : function ( index ) {
                                 var cloned = {
                                     index      : ( typeof index === 'number' ? index : this.index ),
                                     name       : this.name,
@@ -153,7 +153,7 @@ THREE.OBJLoader.prototype = {
 
                     },
 
-                    currentMaterial : function() {
+                    currentMaterial : function () {
 
                         if ( this.materials.length > 0 ) {
                             return this.materials[ this.materials.length - 1 ];
@@ -163,7 +163,7 @@ THREE.OBJLoader.prototype = {
 
                     },
 
-                    _finalize : function( end ) {
+                    _finalize : function ( end ) {
 
                         var lastMultiMaterial = this.currentMaterial();
                         if ( lastMultiMaterial && lastMultiMaterial.groupEnd === -1 ) {
@@ -218,7 +218,7 @@ THREE.OBJLoader.prototype = {
 
             },
 
-            finalize : function() {
+            finalize : function () {
 
                 if ( this.object && typeof this.object._finalize === 'function' ) {
 

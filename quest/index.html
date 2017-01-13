@@ -1,42 +1,43 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="css/styles.css">
-		<link href="https://fonts.googleapis.com/css?family=Dosis:400,600" rel="stylesheet">
-		<title>First three Js program</title>
-	</head>
-	<body>
-		<div id="container">
-			<canvas></canvas>
-			<div class="instruction-container">
-				<p>Welcome to the quest. On your journey you will look for pillars, which will ask you riddles. If you get the answer right, you will get directions. If you get it wrong, you will continue wandering. Find the treasure chest to win.</p>
-				<button type="button" id="start-button" value="start">Start</button>
-			</div>
-			<div class="riddleContainer">
-				<div class="question"></div>
-				<div class="answer">
-					<input type="text" name="answer" class="form-input">
-					<button type="button" id="answer-button" value="submit">Send me on my way!</button>
-				</div>
-			</div>
-		</div>
-		<div id="inset">
-			<div class="north">N</div>
-			<div class="south">S</div>
-			<div class="east">E</div>
-			<div class="west">W</div>
-		</div>
+    <head>
+        <link rel="stylesheet" type="text/css" href="css/styles.css">
+        <link href="https://fonts.googleapis.com/css?family=Economica:400,700" rel="stylesheet">
+        <title>The Quest - An Adventure Game</title>
+    </head>
+    <body>
+        <div class="container-3d-canvas">
+            <canvas class="threed-canvas"></canvas>
+            <div class="instruction-container">
+                <p>Welcome to the quest. On your journey you will look for pillars, which will ask you riddles. If you get the answer right, you will get directions. If you get it wrong, you will continue wandering. Find the treasure chest to win.</p>
+                <button type="button" id="js-start-button" class="start-button" value="start">Start</button>
+            </div>
+            <div class="riddle-container hidden">
+                <div class="question"></div>
+                <div class="answer hidden">
+                    <input type="text" name="answer" class="form-input">
+                    <button type="button" id="js-answer-button" class="answer-button" value="submit">Send me on my way!</button>
+                </div>
+            </div>
+        </div>
+        <div id="js-HUD" class="hud">
+            <div class="north-hud-label">N</div>
+            <div class="south-hud-label">S</div>
+            <div class="east-hud-label">E</div>
+            <div class="west-hud-label">W</div>
+        </div>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.1/lodash.js"></script>
-		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"></script>
-		<script type="text/javascript" src="js/OBJLoader.js"></script>
-		<script type="text/javascript" src="js/events.js"></script>
-		<script type="text/javascript" src="js/riddles.js"></script>
-		<script type="text/javascript" src="js/hud.js"></script>
-		<script type="text/javascript" src="js/world.js"></script>
-		<script type="text/javascript" src="js/player.js"></script>
-		<script type="text/javascript" src="js/game.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
-	</body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.1/lodash.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js"></script>
+        <script type="text/javascript" src="js/keycodes.js"></script>
+        <script type="text/javascript" src="js/OBJLoader.js"></script>
+        <script type="text/javascript" src="js/eventEmitter.js"></script>
+        <script type="text/javascript" src="js/riddles.js"></script>
+        <script type="text/javascript" src="js/hud.js"></script>
+        <script type="text/javascript" src="js/world.js"></script>
+        <script type="text/javascript" src="js/player.js"></script>
+        <script type="text/javascript" src="js/game.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+    </body>
 </html>
